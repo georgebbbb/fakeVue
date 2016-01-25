@@ -1,0 +1,24 @@
+{
+  "name": "trace-vue",
+  "version": "0.0.1",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev":"webpack --watch"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+  "babel": "^6.3.13",
+  "babel-core": "^6.3.21",
+  "babel-loader": "^6.2.0",
+  "babel-preset-es2015": "^6.3.13",
+  "expect": "^1.6.0",
+  "node-libs-browser": "^0.5.2",
+  "webpack": "^1.12.9",
+  "webpack-dev-middleware": "^1.2.0",
+  "webpack-dev-server": "^1.14.0",
+  "webpack-hot-middleware": "^2.2.0"
+  }
+}
