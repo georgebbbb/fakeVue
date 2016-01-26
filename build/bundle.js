@@ -87,6 +87,7 @@
 	    (0, _util.def)(value, '__ob__', this);
 	    this.walk(value);
 	  }
+	  //递归。。让每个字属性可以observe
 
 	  _createClass(Observer, [{
 	    key: "walk",
@@ -255,7 +256,6 @@
 	  _createClass(Dep, [{
 	    key: "addSub",
 	    value: function addSub(sub) {
-
 	      this.subs.push(sub);
 	    }
 	  }, {
@@ -265,12 +265,20 @@
 	        return sub.update();
 	      });
 	    }
+	  }, {
+	    key: "depend",
+	    value: function depend() {
+	      Dep.target.addDep(this);
+	    }
 	  }]);
 
 	  return Dep;
 	}();
 
+	//Dep.target  的是watcher
+
 	exports.default = Dep;
+	Dep.target = null;
 
 /***/ }
 /******/ ]);

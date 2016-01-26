@@ -16,10 +16,15 @@ export default class Dep {
     this.subs = []
   }
   addSub(sub){
-
     this.subs.push(sub)
   }
   notify(){
     this.subs.forEach(sub=>sub.update())
   }
+  depend(){
+    Dep.target.addDep(this)
+  }
 }
+
+//Dep.target  的是watcher
+Dep.target = null

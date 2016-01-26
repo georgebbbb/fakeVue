@@ -1,15 +1,21 @@
-
+import Watcher from '../watcher'
+import {observe} from "../../observer"
 
 class Vue {
-  constructor () {
+  constructor (options={}) {
+
+
+    //这里简化了。。其实要merge
+    this.$options=options
+    //这里简化了。。其实要区分的
+    let data = this._data=this.$options.data
+    observe(data,this)
 
   }
+
+
   $watch(expOrFn, cb, options){
-
-    var watcher = new Watcher(vm, expOrFn, cb)
-
-
-
+    new Watcher(this, expOrFn, cb)
   }
 
 }

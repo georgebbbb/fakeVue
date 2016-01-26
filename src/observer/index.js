@@ -11,7 +11,7 @@ export default class  Observer{
     this.walk(value)
 
   }
-
+  //递归。。让每个字属性可以observe
   walk(value){
     Object.keys(value).forEach(key=>this.convert(key,value[key]))
   }
@@ -37,8 +37,6 @@ export function defineReactive (obj, key, val) {
       if(childOb){
         childOb.dep.depend()
       }
-
-
     },
     set:newVal=> {
       var value =  val
