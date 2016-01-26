@@ -50,7 +50,28 @@
 
 	var _observer2 = _interopRequireDefault(_observer);
 
+	var _vue = __webpack_require__(5);
+
+	var _vue2 = _interopRequireDefault(_vue);
+
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	var v = new _vue2.default({
+	  data: {
+	    a: 1,
+	    b: {
+	      c: 3
+	    }
+	  }
+	});
+
+	v.$watch("a", function () {
+	  return console.log("哈哈");
+	});
+
+	setTimeout(function () {
+	  v.a = 4;
+	}, 1000);
 
 /***/ },
 /* 1 */
@@ -117,17 +138,22 @@
 	    enumerable: true,
 	    configurable: true,
 	    get: function get() {
-	      dep.depend();
-	      if (childOb) {
-	        childOb.dep.depend();
+	      // 说明这是watch 引起的
+	      console.log("get");
+	      if (_dep2.default.target) {
+	        console.log(1111);
+	        dep.depend();
 	      }
+	      return val;
 	    },
 	    set: function set(newVal) {
+
 	      var value = val;
 	      if (newVal === value) {
 	        return;
 	      }
 	      val = newVal;
+	      console.log(9999);
 	      childOb = observe(newVal);
 	      dep.notify();
 	    }
@@ -135,6 +161,7 @@
 	}
 
 	function observe(value, vm) {
+
 	  if (!value || (typeof value === "undefined" ? "undefined" : _typeof(value)) !== 'object') {
 	    return;
 	  }
@@ -279,6 +306,157 @@
 
 	exports.default = Dep;
 	Dep.target = null;
+
+/***/ },
+/* 5 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+
+	var _watcher = __webpack_require__(6);
+
+	var _watcher2 = _interopRequireDefault(_watcher);
+
+	var _observer = __webpack_require__(1);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	var Vue = function () {
+	  function Vue() {
+	    var _this = this;
+
+	    var options = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
+
+	    _classCallCheck(this, Vue);
+
+	    //这里简化了。。其实要merge
+	    this.$options = options;
+	    //这里简化了。。其实要区分的
+	    var data = this._data = this.$options.data;
+	    Object.keys(data).forEach(function (key) {
+	      return _this._proxy(key);
+	    });
+
+	    (0, _observer.observe)(data, this);
+
+	    //  Object.keys(data).forEach(key=>this[key]=data[key])
+	    //  console.log(555,data.a);
+	  }
+
+	  _createClass(Vue, [{
+	    key: "$watch",
+	    value: function $watch(expOrFn, cb, options) {
+	      new _watcher2.default(this, expOrFn, cb);
+	    }
+	  }, {
+	    key: "_proxy",
+	    value: function _proxy(key) {
+
+	      var self = this;
+	      Object.defineProperty(self, key, {
+	        configurable: true,
+	        enumerable: true,
+	        get: function proxyGetter() {
+	          return self._data[key];
+	        },
+	        set: function proxySetter(val) {
+	          self._data[key] = val;
+	        }
+	      });
+	    }
+	  }]);
+
+	  return Vue;
+	}();
+
+	exports.default = Vue;
+
+/***/ },
+/* 6 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+
+	var _dep = __webpack_require__(4);
+
+	var _dep2 = _interopRequireDefault(_dep);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	var Watcher = function () {
+	  function Watcher(vm, expOrFn, cb) {
+	    _classCallCheck(this, Watcher);
+
+	    this.cb = cb;
+	    this.vm = vm;
+	    //此处简化
+	    this.getter = expOrFn;
+	    this.value = this.get();
+	  }
+
+	  _createClass(Watcher, [{
+	    key: 'update',
+	    value: function update() {
+	      this.run();
+	    }
+	  }, {
+	    key: 'run',
+	    value: function run() {
+	      var value = this.get();
+	      if (value !== this.value) {
+	        this.value = value;
+	        this.cb.call(this.vm);
+	      }
+	    }
+	  }, {
+	    key: 'addDep',
+	    value: function addDep(dep) {
+	      dep.addSub(this);
+	    }
+	  }, {
+	    key: 'beforeGet',
+	    value: function beforeGet() {
+
+	      _dep2.default.target = this;
+	    }
+	  }, {
+	    key: 'afterGet',
+	    value: function afterGet() {
+	      _dep2.default.target = null;
+	    }
+	  }, {
+	    key: 'get',
+	    value: function get() {
+	      this.beforeGet();
+	      console.log(7777);
+	      //此处简化。。要区分fuction还是expression
+	      var value = this.vm._data[this.getter];
+
+	      this.afterGet();
+	      return value;
+	    }
+	  }]);
+
+	  return Watcher;
+	}();
+
+	exports.default = Watcher;
 
 /***/ }
 /******/ ]);

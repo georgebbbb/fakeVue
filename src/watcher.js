@@ -1,6 +1,6 @@
 import Dep from './observer/dep'
 
-class Watcher {
+export default class Watcher {
   constructor(vm, expOrFn, cb) {
     this.cb = cb
     this.vm = vm
@@ -22,6 +22,7 @@ class Watcher {
     dep.addSub(this)
   }
   beforeGet(){
+
     Dep.target = this
   }
   afterGet(){
@@ -29,8 +30,12 @@ class Watcher {
   }
   get(){
     this.beforeGet()
+      console.log(7777);
     //此处简化。。要区分fuction还是expression
-    value = this.vm[this.getter]
+    const value = this.vm._data[this.getter]
+
+
+
     this.afterGet()
     return value
   }

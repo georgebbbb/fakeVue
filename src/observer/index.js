@@ -33,17 +33,22 @@ export function defineReactive (obj, key, val) {
     enumerable: true,
     configurable: true,
     get: ()=>{
-      dep.depend()
-      if(childOb){
-        childOb.dep.depend()
+      // 说明这是watch 引起的
+      console.log("get");
+      if(Dep.target){
+        console.log(1111);
+        dep.depend()
       }
+      return val
     },
     set:newVal=> {
+
       var value =  val
       if (newVal === value) {
         return
       }
       val = newVal
+      console.log(9999);
       childOb = observe(newVal)
       dep.notify()
     }
@@ -52,6 +57,7 @@ export function defineReactive (obj, key, val) {
 
 
 export function observe (value, vm) {
+
   if (!value || typeof value !== 'object') {
     return
   }
