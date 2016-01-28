@@ -21,9 +21,6 @@ export default class Dep {
   notify(){
     this.subs.forEach(sub=>sub.update())
   }
-  depend(){
-    Dep.target.addDep(this)
-  }
 }
 
 //Dep.target  的是watcher

@@ -73,6 +73,10 @@
 	  v.a = 4;
 	}, 1000);
 
+	setTimeout(function () {
+	  v.a = 5;
+	}, 2000);
+
 /***/ },
 /* 1 */
 /***/ function(module, exports, __webpack_require__) {
@@ -105,7 +109,6 @@
 
 	    this.value = value;
 	    this.dep = new _dep2.default();
-	    (0, _util.def)(value, '__ob__', this);
 	    this.walk(value);
 	  }
 	  //递归。。让每个字属性可以observe
@@ -139,21 +142,17 @@
 	    configurable: true,
 	    get: function get() {
 	      // 说明这是watch 引起的
-	      console.log("get");
 	      if (_dep2.default.target) {
-	        console.log(1111);
-	        dep.depend();
+	        dep.addSub(_dep2.default.target);
 	      }
 	      return val;
 	    },
 	    set: function set(newVal) {
-
 	      var value = val;
 	      if (newVal === value) {
 	        return;
 	      }
 	      val = newVal;
-	      console.log(9999);
 	      childOb = observe(newVal);
 	      dep.notify();
 	    }
@@ -161,7 +160,6 @@
 	}
 
 	function observe(value, vm) {
-
 	  if (!value || (typeof value === "undefined" ? "undefined" : _typeof(value)) !== 'object') {
 	    return;
 	  }
@@ -292,11 +290,6 @@
 	        return sub.update();
 	      });
 	    }
-	  }, {
-	    key: "depend",
-	    value: function depend() {
-	      Dep.target.addDep(this);
-	    }
 	  }]);
 
 	  return Dep;
@@ -344,11 +337,7 @@
 	    Object.keys(data).forEach(function (key) {
 	      return _this._proxy(key);
 	    });
-
 	    (0, _observer.observe)(data, this);
-
-	    //  Object.keys(data).forEach(key=>this[key]=data[key])
-	    //  console.log(555,data.a);
 	  }
 
 	  _createClass(Vue, [{
@@ -406,7 +395,7 @@
 	    this.cb = cb;
 	    this.vm = vm;
 	    //此处简化
-	    this.getter = expOrFn;
+	    this.expOrFn = expOrFn;
 	    this.value = this.get();
 	  }
 
@@ -431,24 +420,18 @@
 	    }
 	  }, {
 	    key: 'beforeGet',
-	    value: function beforeGet() {
-
-	      _dep2.default.target = this;
-	    }
+	    value: function beforeGet() {}
 	  }, {
 	    key: 'afterGet',
-	    value: function afterGet() {
-	      _dep2.default.target = null;
-	    }
+	    value: function afterGet() {}
 	  }, {
 	    key: 'get',
 	    value: function get() {
-	      this.beforeGet();
+	      _dep2.default.target = this;
 	      console.log(7777);
 	      //此处简化。。要区分fuction还是expression
-	      var value = this.vm._data[this.getter];
-
-	      this.afterGet();
+	      var value = this.vm._data[this.expOrFn];
+	      _dep2.default.target = null;
 	      return value;
 	    }
 	  }]);

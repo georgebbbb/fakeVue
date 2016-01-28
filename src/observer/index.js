@@ -7,9 +7,7 @@ export default class  Observer{
   constructor(value) {
     this.value = value
     this.dep = new Dep()
-    def(value, '__ob__', this)
     this.walk(value)
-
   }
   //递归。。让每个字属性可以observe
   walk(value){
@@ -18,8 +16,6 @@ export default class  Observer{
   convert(key, val){
     defineReactive(this.value, key, val)
   }
-
-
 }
 
 
@@ -34,21 +30,17 @@ export function defineReactive (obj, key, val) {
     configurable: true,
     get: ()=>{
       // 说明这是watch 引起的
-      console.log("get");
       if(Dep.target){
-        console.log(1111);
-        dep.depend()
+        dep.addSub(Dep.target)
       }
       return val
     },
     set:newVal=> {
-
       var value =  val
       if (newVal === value) {
         return
       }
       val = newVal
-      console.log(9999);
       childOb = observe(newVal)
       dep.notify()
     }
@@ -57,7 +49,6 @@ export function defineReactive (obj, key, val) {
 
 
 export function observe (value, vm) {
-
   if (!value || typeof value !== 'object') {
     return
   }

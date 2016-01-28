@@ -8,11 +8,8 @@ export default class Vue {
     //这里简化了。。其实要区分的
     let data = this._data=this.$options.data
     Object.keys(data).forEach(key=>this._proxy(key))
-
     observe(data,this)
 
-  //  Object.keys(data).forEach(key=>this[key]=data[key])
-  //  console.log(555,data.a);
   }
 
 

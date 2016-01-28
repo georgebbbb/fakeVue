@@ -16,5 +16,10 @@ v.$watch("a",()=>console.log("哈哈"))
 
 setTimeout(()=>{
   v.a = 4
-  
+
 },1000)
+
+setTimeout(()=>{
+  v.a = 5
+
+},2000)

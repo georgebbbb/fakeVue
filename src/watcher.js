@@ -5,7 +5,7 @@ export default class Watcher {
     this.cb = cb
     this.vm = vm
     //此处简化
-    this.getter = expOrFn
+    this.expOrFn = expOrFn
     this.value = this.get()
   }
   update(){
@@ -23,20 +23,17 @@ export default class Watcher {
   }
   beforeGet(){
 
-    Dep.target = this
+
   }
   afterGet(){
-    Dep.target = null
+
   }
   get(){
-    this.beforeGet()
-      console.log(7777);
+    Dep.target = this
+    console.log(7777);
     //此处简化。。要区分fuction还是expression
-    const value = this.vm._data[this.getter]
-
-
-
-    this.afterGet()
+    const value = this.vm._data[this.expOrFn]
+    Dep.target = null
     return value
   }
 }
